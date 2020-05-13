@@ -1,5 +1,3 @@
-ARCHS = arm64
-
 INSTALL_TARGET_PROCESSES = Preferences
 
 include $(THEOS)/makefiles/common.mk

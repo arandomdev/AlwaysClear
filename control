@@ -1,7 +1,7 @@
 Package: com.haotestlabs.alwaysclear
 Name: AlwaysClear
 Depends: mobilesubstrate
-Version: 1.1.0.1
+Version: 1.1.1.0
 Architecture: iphoneos-arm
 Description: Get rid of that "Clear up next" alert in the music player!
 Maintainer: ArandomDev <Haow6449@gmail.com>
