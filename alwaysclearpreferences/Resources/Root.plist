@@ -6,15 +6,21 @@
 	<array>
 		<dict>
 			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Close the music app after changing.</string>
+		</dict>
+		<dict>
+			<key>cell</key>
 			<string>PSLinkListCell</string>
 			<key>default</key>
 			<integer>1</integer>
 			<key>defaults</key>
 			<string>com.haotestlabs.alwaysclearpreferences</string>
 			<key>PostNotification</key>
-			<string>com.haotestlabs.alwaysclearpreferences/ReloadPrefs</string>
+			<string>com.haotestlabs.alwaysclearpreferences.reload</string>
 			<key>key</key>
-			<string>mode</string>
+			<string>ACMode</string>
 			<key>detail</key>
 			<string>PSListItemsController</string>
 			<key>label</key>

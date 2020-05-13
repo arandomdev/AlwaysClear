@@ -1,18 +1,18 @@
-#import <Cephei/HBPreferences.h>
-
 @interface UIAlertAction ()
 @property (nonatomic,copy) void (^handler)(UIAlertAction *action);
 @end
 
-HBPreferences *preferences;
-NSInteger ACMode;
+NSInteger ACMode = 1;
 
 %hook MusicApplicationTabController
 - (void)presentViewController:(UIViewController *)viewControllerToPresent animated:(BOOL)flag completion:(void (^)(void))completion {
 	if ([viewControllerToPresent isKindOfClass:[UIAlertController class]]) {
 
 		UIAlertController *alertController = (UIAlertController *)viewControllerToPresent;
-		if ([alertController.message isEqual:@"After playing this, do you want to keep playing your Up Next queue?"]) {
+		if (
+			[alertController.message containsString:@"playing"]
+			&& [alertController.message containsString:@"queue"]
+		) {
 			HBLogDebug(@"change with mode: %ld", ACMode);
 			if (ACMode != 2) {
 				UIAlertAction *clearAction = alertController.actions[ACMode];
@@ -30,9 +30,35 @@ NSInteger ACMode;
 }
 %end
 
+static void reloadPreferences() {
+	NSString *preferencesFilePath = [NSString stringWithFormat:@"/User/Library/Preferences/com.haotestlabs.alwaysclearpreferences.plist"];
+	
+	NSData *fileData = [NSData dataWithContentsOfFile:preferencesFilePath];
+	if (fileData) {
+		NSError *error = nil;
+		NSDictionary *preferences = [NSPropertyListSerialization propertyListWithData:fileData options:NSPropertyListImmutable format:nil error:&error];
+		
+		if (error) {
+			HBLogError(@"Unable to read preference file, Error: %@", error);
+		}
+		else {
+			if (preferences[@"ACMode"]) {
+				ACMode = [preferences[@"ACMode"] intValue];
+			}
+		}
+	}
+}
+
 %ctor {
 	%init(MusicApplicationTabController = NSClassFromString(@"MusicApplication.TabBarController"));
 	
-	preferences = [[HBPreferences alloc] initWithIdentifier:@"com.haotestlabs.alwaysclearpreferences"];
-	[preferences registerInteger:&ACMode default:1 forKey:@"mode"];
+	reloadPreferences();
+	CFNotificationCenterAddObserver(
+		CFNotificationCenterGetDarwinNotifyCenter(),
+		NULL,
+		(CFNotificationCallback)reloadPreferences,
+		CFSTR("com.haotestlabs.alwaysclearpreferences.reload"),
+		NULL,
+		CFNotificationSuspensionBehaviorCoalesce
+	);
 }
